@@ -1,4 +1,3 @@
-// src/components/dynamic/DynamicForm.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -9,53 +8,63 @@ const DynamicForm = () => {
     useEffect(() => {
         // Fetch questions from the backend
         axios.get('http://localhost:5000/api/questions')
-        .then(response => {
-            console.log('Fetched questions:', response.data);
-            setQuestions(response.data);
-        })
+            .then(response => {
+                console.log('Fetched questions:', response.data);
+                setQuestions(response.data);
+            })
             .catch(error => console.error('Error fetching questions:', error));
     }, []);
 
-    const handleChange = (e, questionId) => {
-        setFormData({
-            ...formData,
-            [questionId]: e.target.value,
-        });
+    const handleChange = (e, questionId, field) => {
+        const value = e.target.value;
+
+        if (field) {
+            setFormData(prevState => ({
+                ...prevState,
+                [questionId]: {
+                    ...prevState[questionId],
+                    [field]: value,
+                },
+            }));
+        } else {
+            setFormData({
+                ...formData,
+                [questionId]: value,
+            });
+        }
     };
-
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     axios.post('http://localhost:5000/api/answers', {
-    //         answers: formData,
-    //     })
-    //     .then(response => alert('Form submitted successfully!'))
-    //     .catch(error => console.error('Error submitting form:', error));
-    // };
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:5000/api/answers', {
-            answers: formData,
-        })
-        .then(response => alert('Form submitted successfully!'))
-        .catch(error => {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                console.error('Server responded with error:', error.response.data);
-                console.error('Status code:', error.response.status);
-            } else if (error.request) {
-                // The request was made but no response was received
-                console.error('No response received:', error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.error('Error in setting up request:', error.message);
-            }
-            console.error('Axios config:', error.config);
-        });
-    };
 
+        const formattedData = Object.entries(formData).reduce((acc, [key, value]) => {
+            if (typeof value === 'object' && value.name && value.jobTitle) {
+                acc[key] = {
+                    name: value.name,
+                    jobTitle: value.jobTitle,
+                };
+            } else {
+                acc[key] = value;
+            }
+            return acc;
+        }, {});
+
+        axios.post('http://localhost:5000/api/answers', {
+            answers: formattedData,
+        })
+            .then(response => alert('Form submitted successfully!'))
+            .catch(error => {
+                if (error.response) {
+                    console.error('Server responded with error:', error.response.data);
+                    console.error('Status code:', error.response.status);
+                } else if (error.request) {
+                    console.error('No response received:', error.request);
+                } else {
+                    console.error('Error in setting up request:', error.message);
+                }
+                console.error('Axios config:', error.config);
+            });
+    };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,12 +79,15 @@ const DynamicForm = () => {
                                 type="text"
                                 onChange={(e) => handleChange(e, question._id)}
                                 className="border border-gray-300 p-2 rounded"
+                                value={formData[question._id] || ''}
+                                placeholder="Enter your answer"
                             />
                         )}
                         {question.questionType === 'dropdown' && (
                             <select
                                 onChange={(e) => handleChange(e, question._id)}
                                 className="border border-gray-300 p-2 rounded"
+                                value={formData[question._id] || ''}
                             >
                                 <option value="">Select an option</option>
                                 {question.options.map(option => (
@@ -86,17 +98,22 @@ const DynamicForm = () => {
                             </select>
                         )}
                         {question.questionType === 'multiple' && (
-                            question.options.map(option => (
-                                <div key={option} className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        value={option}
-                                        onChange={(e) => handleChange(e, question._id)}
-                                        className="mr-2"
-                                    />
-                                    <label>{option}</label>
-                                </div>
-                            ))
+                            <div className="space-y-4">
+                                <input
+                                    type="text"
+                                    placeholder="Name"
+                                    onChange={(e) => handleChange(e, question._id, 'name')}
+                                    className="border border-gray-300 p-2 rounded mb-2"
+                                    value={formData[question._id]?.name || ''}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Job Title"
+                                    onChange={(e) => handleChange(e, question._id, 'jobTitle')}
+                                    className="border border-gray-300 p-2 rounded"
+                                    value={formData[question._id]?.jobTitle || ''}
+                                />
+                            </div>
                         )}
                     </div>
                 ))
