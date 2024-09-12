@@ -7,6 +7,7 @@ const DynamicForm = () => {
     const [questions, setQuestions] = useState([]);
     const [formData, setFormData] = useState({});
     const [files, setFiles] = useState({}); // To store files for each question
+    const [error, setError] = useState(''); // Error message for validation
 
     useEffect(() => {
         // Fetch questions from the backend
@@ -46,8 +47,28 @@ const DynamicForm = () => {
         });
     };
 
+    // Validate the form before submission
+    const validateForm = () => {
+        for (const question of questions) {
+            const answer = formData[question._id];
+
+            // Check if the answer is missing for required questions
+            if (!answer || (typeof answer === 'object' && Object.values(answer).some(val => !val))) {
+                setError(`Please fill all required fields for Question ${question.questionText}`);
+                return false;
+            }
+        }
+        setError(''); // Clear error message if all validations pass
+        return true;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Validate the form before proceeding
+        if (!validateForm()) {
+            return; // If validation fails, do not submit the form
+        }
 
         const formDataToSend = new FormData(); // FormData for multipart/form-data
 
@@ -71,7 +92,12 @@ const DynamicForm = () => {
 
         // Send data to the backend
         axios.post('http://localhost:5000/api/answers/submit', formDataToSend)
-            .then(response => alert('Form submitted successfully!'))
+            .then(response => {
+                alert('Form submitted successfully!');
+                // Reset form data after submission
+                setFormData({});
+                setFiles({});
+            })
             .catch(error => {
                 if (error.response) {
                     console.error('Server responded with error:', error.response.data);
@@ -100,6 +126,9 @@ const DynamicForm = () => {
             {/* Main form area */}
             <div className="flex-1 ml-64 p-6"> {/* Added ml-64 to provide space for sidebar */}
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Display validation error */}
+                    {error && <p className="text-red-500">{error}</p>}
+
                     {questions.length > 0 ? (
                         questions.map((question, index) => (
                             <div key={question._id} className="flex flex-col space-y-4">
@@ -113,6 +142,7 @@ const DynamicForm = () => {
                                         className="border border-gray-300 p-2 rounded"
                                         value={formData[question._id] || ''}
                                         placeholder="Enter your answer"
+                                        required
                                     />
                                 )}
                                 {question.questionType === 'dropdown' && (
@@ -120,6 +150,7 @@ const DynamicForm = () => {
                                         onChange={(e) => handleChange(e, question._id)}
                                         className="border border-gray-300 p-2 rounded"
                                         value={formData[question._id] || ''}
+                                        required
                                     >
                                         <option value="">Select an option</option>
                                         {question.options.map(option => (
@@ -135,8 +166,9 @@ const DynamicForm = () => {
                                             type="text"
                                             placeholder="Name"
                                             onChange={(e) => handleChange(e, question._id, 'name')}
-                                            className="border border-gray-300 p-2 rounded"
+                                            className="border border-gray-300 p-2 rounded mb-2"
                                             value={formData[question._id]?.name || ''}
+                                            required
                                         />
                                         <input
                                             type="text"
@@ -144,6 +176,7 @@ const DynamicForm = () => {
                                             onChange={(e) => handleChange(e, question._id, 'jobTitle')}
                                             className="border border-gray-300 p-2 rounded"
                                             value={formData[question._id]?.jobTitle || ''}
+                                            required
                                         />
                                     </div>
                                 )}
@@ -156,6 +189,7 @@ const DynamicForm = () => {
                                             multiple
                                             onChange={(e) => handleFileUpload(e, question._id)}
                                             className="border border-gray-300 p-2 rounded"
+                                            required
                                         />
                                     </div>
                                 )}

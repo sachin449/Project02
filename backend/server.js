@@ -1,4 +1,5 @@
-// backend/server.js
+// Path: backend/server.js
+
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const app = require('./app'); // Import the app object

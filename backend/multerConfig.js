@@ -24,12 +24,12 @@ const storage = multer.diskStorage({
     }
 });
 
-// File filter for allowed MIME types (Update allowed types here)
+// File filter for allowed MIME types
 const fileFilter = (req, file, cb) => {
     if (config.allowedFileTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Invalid file type. Only JPEG, PNG, PDF, TXT, and DOCX are allowed.'), false); // Update the error message
+        cb(new Error('Invalid file type. Only allowed file types are permitted.'), false);
     }
 };
 
