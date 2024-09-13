@@ -9,6 +9,7 @@ exports.submitAnswer = async (req, res) => {
         const dummyUser = await User.findOne({ email: 'john.doe@example.com' });
 
         if (!dummyUser) {
+                                         // alerts ou
             return res.status(404).json({ error: 'Dummy user not found' });
         }
 
