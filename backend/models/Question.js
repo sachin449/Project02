@@ -72,15 +72,6 @@ const QuestionSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    questionType: {
-        type: String,
-        enum: ['string', 'dropdown', 'multiple'],
-        required: true,
-    },
-    options: {
-        type: [String],
-        required: function() { return this.questionType !== 'string'; }
-    },
     category:{
         type: String,
         required: true,
