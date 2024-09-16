@@ -1,7 +1,9 @@
+// Path: client/src/pages/HomePage.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Topbar from '../components/static/Topbar';
 import Sidebar from '../components/static/Sidebar';
+import config from '../config'; // Import config
 
 const HomePage = () => {
     const [categories, setCategories] = useState([]); 
@@ -9,54 +11,50 @@ const HomePage = () => {
     const [subcategories, setSubcategories] = useState([]); 
     const [questions, setQuestions] = useState([]); 
 
-
     useEffect(() => {
-        axios.get('http://localhost:5000/api/questions/categories')
+        axios.get(`${config.apiBaseUrl}${config.apiEndpoints.categories}`, { timeout: config.requestTimeout }) // Use apiBaseUrl and endpoints from config
             .then(response => {
                 setCategories(response.data);
             })
-            .catch(error => {
-                console.error('Error fetching categories:', error);
+            .catch(() => {
+                console.error(config.errorMessages.fetchCategoriesError); // Use error message from config
             });
     }, []);
 
-  
     const handleCategoryClick = (category) => {
         setSelectedCategory(category);
 
-       
-        axios.get(`http://localhost:5000/api/questions/subcategories/${category}`)
+        axios.get(`${config.apiBaseUrl}${config.apiEndpoints.subcategories}/${category}`, { timeout: config.requestTimeout }) // Use apiBaseUrl and endpoints from config
             .then(response => {
                 setSubcategories(response.data);
             })
-            .catch(error => {
-                console.error('Error fetching subcategories:', error);
+            .catch(() => {
+                console.error(config.errorMessages.fetchSubcategoriesError); // Use error message from config
             });
     };
 
-   
     const handleSubcategoryClick = (subcategory) => {
-        axios.get(`http://localhost:5000/api/questions/subcategory/${subcategory}`)
+        axios.get(`${config.apiBaseUrl}${config.apiEndpoints.questionsBySubcategory}/${subcategory}`, { timeout: config.requestTimeout }) // Use apiBaseUrl and endpoints from config
             .then(response => {
                 setQuestions(response.data); 
             })
-            .catch(error => {
-                console.error('Error fetching questions:', error);
+            .catch(() => {
+                console.error(config.errorMessages.fetchQuestionsError); // Use error message from config
             });
     };
 
     return (
         <div className="flex">
-          
+            {/* Topbar always visible */}
             <Topbar categories={categories} onCategoryClick={handleCategoryClick} />
 
-           
+            {/* Sidebar visible only after a category is selected */}
             {selectedCategory && (
                 <Sidebar subcategories={subcategories} onSubcategoryClick={handleSubcategoryClick} />
             )}
 
-       
-            <div className="flex-1 ml-64 p-6 mt-16">
+            {/* Main content area */}
+            <div className={`flex-1 ml-64 p-6 mt-16`}>
                 <h1 className="text-3xl font-bold mb-6">Questions for the selected subcategory</h1>
                 {questions.length > 0 ? (
                     questions.map((question, index) => (
@@ -70,7 +68,7 @@ const HomePage = () => {
                         </div>
                     ))
                 ) : (
-                    <p>No questions available for the selected subcategory.</p>
+                    <p>{config.errorMessages.noQuestionsAvailable}</p> 
                 )}
             </div>
         </div>
@@ -78,5 +76,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
