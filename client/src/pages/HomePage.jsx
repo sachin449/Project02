@@ -4,41 +4,41 @@ import Topbar from '../components/static/Topbar';
 import Sidebar from '../components/static/Sidebar';
 
 const HomePage = () => {
-    const [categories, setCategories] = useState([]); // Store all categories
-    const [selectedCategory, setSelectedCategory] = useState(null); // Store selected category
-    const [subcategories, setSubcategories] = useState([]); // Store subcategories for the selected category
-    const [questions, setQuestions] = useState([]); // Store questions for the selected subcategory
+    const [categories, setCategories] = useState([]); 
+    const [selectedCategory, setSelectedCategory] = useState(null); 
+    const [subcategories, setSubcategories] = useState([]); 
+    const [questions, setQuestions] = useState([]); 
 
-    // Fetch categories on component mount
+
     useEffect(() => {
         axios.get('http://localhost:5000/api/questions/categories')
             .then(response => {
-                setCategories(response.data); // Store categories fetched from the backend
+                setCategories(response.data);
             })
             .catch(error => {
                 console.error('Error fetching categories:', error);
             });
     }, []);
 
-    // Handle category click and fetch subcategories based on the selected category
+  
     const handleCategoryClick = (category) => {
-        setSelectedCategory(category); // Set the selected category
+        setSelectedCategory(category);
 
-        // Fetch subcategories for the selected category
+       
         axios.get(`http://localhost:5000/api/questions/subcategories/${category}`)
             .then(response => {
-                setSubcategories(response.data); // Store subcategories fetched from backend
+                setSubcategories(response.data);
             })
             .catch(error => {
                 console.error('Error fetching subcategories:', error);
             });
     };
 
-    // Handle subcategory click and fetch questions for that subcategory
+   
     const handleSubcategoryClick = (subcategory) => {
         axios.get(`http://localhost:5000/api/questions/subcategory/${subcategory}`)
             .then(response => {
-                setQuestions(response.data); // Store questions fetched from backend
+                setQuestions(response.data); 
             })
             .catch(error => {
                 console.error('Error fetching questions:', error);
@@ -47,21 +47,26 @@ const HomePage = () => {
 
     return (
         <div className="flex">
-            {/* Topbar always visible */}
+          
             <Topbar categories={categories} onCategoryClick={handleCategoryClick} />
 
-            {/* Sidebar visible only after a category is selected */}
+           
             {selectedCategory && (
                 <Sidebar subcategories={subcategories} onSubcategoryClick={handleSubcategoryClick} />
             )}
 
-            {/* Main content area to display questions */}
-            <div className="flex-1 p-6 mt-16">
-                <h1 className="text-3xl font-bold">Questions for the selected subcategory</h1>
+       
+            <div className="flex-1 ml-64 p-6 mt-16">
+                <h1 className="text-3xl font-bold mb-6">Questions for the selected subcategory</h1>
                 {questions.length > 0 ? (
                     questions.map((question, index) => (
-                        <div key={index} className="mt-4">
-                            <h3 className="text-lg font-semibold">{question.questionText}</h3> {/* Display questionText */}
+                        <div key={index} className="flex items-start space-x-4 mt-4">
+                            <span className="text-lg font-semibold">
+                                {index + 1}.
+                            </span> 
+                            <h3 className="text-lg">
+                                {question.questionText}
+                            </h3> 
                         </div>
                     ))
                 ) : (
@@ -75,19 +80,3 @@ const HomePage = () => {
 export default HomePage;
 
 
-// // src/pages/HomePage.jsx
-// import React from 'react';
-// import { Link } from 'react-router-dom';
-
-// function HomePage() {
-//     return (
-//         <div className="text-center">
-//             <h1 className="text-2xl font-bold mb-4">Welcome to the Dynamic Form App</h1>
-//             <Link to="/form">
-//                 <button className="bg-blue-500 text-white py-2 px-4 rounded">Start Form</button>
-//             </Link>
-//         </div>
-//     );
-// }
-
-// export default HomePage;
