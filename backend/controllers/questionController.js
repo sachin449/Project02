@@ -1,10 +1,33 @@
-// Path: backend/controllers/questionController.js
-
 const Question = require('../models/Question');
 
-exports.getQuestions = async (req, res) => {
+
+exports.getCategories = async (req, res) => {
     try {
-        const questions = await Question.find();
+        const categories = await Question.distinct('category');
+        res.status(200).json(categories);
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        res.status(500).json({ error: 'Failed to fetch categories' });
+    }
+};
+
+
+exports.getSubcategoriesByCategory = async (req, res) => {
+    const { category } = req.params;
+    try {
+        const subcategories = await Question.distinct('subcategory', { category });
+        res.status(200).json(subcategories);
+    } catch (error) {
+        console.error('Error fetching subcategories:', error);
+        res.status(500).json({ error: 'Failed to fetch subcategories' });
+    }
+};
+
+
+exports.getQuestionsBySubcategory = async (req, res) => {
+    const { subcategory } = req.params;
+    try {
+        const questions = await Question.find({ subcategory }, 'questionText');
         res.status(200).json(questions);
     } catch (error) {
         console.error('Error fetching questions:', error);
@@ -12,28 +35,3 @@ exports.getQuestions = async (req, res) => {
     }
 };
 
-// You can add other controllers for creating questions, updating, etc.
-
-
-
-// // backend/controllers/questionController.js
-// const Question = require('../models/Question');
-
-// exports.createQuestion = async (req, res) => {
-//     try {
-//         const newQuestion = new Question(req.body);
-//         await newQuestion.save();
-//         res.status(201).json(newQuestion);
-//     } catch (error) {
-//         res.status(500).json({ error: 'Failed to create question' });
-//     }
-// };
-
-// exports.getQuestions = async (req, res) => {
-//     try {
-//         const questions = await Question.find();
-//         res.status(200).json(questions);
-//     } catch (error) {
-//         res.status(500).json({ error: 'Failed to fetch questions' });
-//     }
-// };
