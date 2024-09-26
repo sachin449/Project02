@@ -1,43 +1,33 @@
-// Path: backend/multerConfig.js
-
 const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
-const config = require('./config');
 
-// Ensure the upload directory exists
-const ensureDirectoryExistence = (dir) => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-};
 
-// Multer storage configuration
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.resolve(config.fileUploadPath);
-        ensureDirectoryExistence(uploadPath); // Ensure directory exists
-        cb(null, uploadPath);
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); 
     },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname); 
     }
 });
 
-// File filter for allowed MIME types
-const fileFilter = (req, file, cb) => {
-    if (config.allowedFileTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Invalid file type. Only allowed file types are permitted.'), false);
-    }
-};
-
-// Multer upload instance
 const upload = multer({
     storage: storage,
-    limits: { fileSize: config.maxFileSize },
-    fileFilter: fileFilter
+    limits: {
+        fileSize: 1024 * 1024 * 5 
+    },
+    fileFilter: function (req, file, cb) {
+        const filetypes = /jpeg|jpg|png|pdf|docx/; 
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = filetypes.test(file.mimetype);
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Only images and document files are allowed!'));
+        }
+    }
 });
 
 module.exports = upload;

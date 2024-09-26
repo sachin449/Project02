@@ -1,17 +1,44 @@
-// Path: client/src/components/Topbar.jsx
+import React, { useState } from 'react';
+import { FaBuilding, FaGlobe, FaTree, FaBolt, FaChartBar } from 'react-icons/fa';
 
-import React from 'react';
+const Topbar = ({ categories, onCategoryClick, progress }) => {
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
-const Topbar = ({ categories, onCategoryClick }) => {
+    const icons = {
+        General: <FaBuilding />,
+        'IFC Performance Standards Compliance': <FaGlobe />,
+        'Compliance with Environment and Social Action Plan': <FaTree />,
+        'Energy Efficiency and Climate': <FaBolt />,
+        'Impact Data': <FaChartBar />
+    };
+
+    const handleCategoryClick = (category) => {
+        setSelectedCategory(category);
+        onCategoryClick(category);
+    };
+
     return (
-        <div className="w-full fixed top-0 left-0 bg-gray-100 p-4 shadow-md flex justify-evenly">
+        <div className="w-full z-20 fixed top-0 left-0 bg-white p-2 rounded-lg shadow-md flex justify-evenly items-center space-x-2 overflow-x-auto">
             {categories.map((category, index) => (
                 <button
                     key={index}
-                    className="bg-blue-500 text-white text-lg font-semibold py-3 px-6 rounded-lg"
-                    onClick={() => onCategoryClick(category)} // Pass selected category back to HomePage
+                    className={`flex flex-col items-center font-semibold py-1 px-2 rounded-lg transition-all duration-300 ease-in-out text-sm
+                        ${category === selectedCategory ? 'bg-blue-100 shadow-lg text-[#01B0F1]' : 'bg-white text-[#01B0F1] hover:bg-blue-100 hover:text-blue-800'}
+                     hover:shadow-lg transform hover:scale-105`}
+                    onClick={() => handleCategoryClick(category)}
                 >
-                    {category}
+                    <div className="text-xl mb-1">{icons[category] || <FaBuilding />}</div>
+                    <span className="text-xs">{category}</span>
+                    
+                    {/* Progress Bar */}
+                    {progress[category] && (
+                        <div className="w-full mt-1 h-1 bg-gray-200 rounded-full">
+                            <div
+                                className="h-full bg-[#01B0F1] rounded-sm"
+                                style={{ width: `${progress[category]}%` }}  // Progress percentage
+                            ></div>
+                        </div>
+                    )}
                 </button>
             ))}
         </div>
@@ -19,19 +46,3 @@ const Topbar = ({ categories, onCategoryClick }) => {
 };
 
 export default Topbar;
-
-// const Topbar = ({ subcategories }) => {
-//     const filteredSubcategories = subcategories.filter(subcategory => subcategory);
-
-//     return (
-//         <div className="w-full fixed top-0 left-0 bg-gray-100 p-4 mb-20 shadow-md flex justify-evenly">
-//             {filteredSubcategories.map((subcategory, index) => (
-//                 <button key={index} className="bg-[#01b0f1] text-white text-lg font-semibold py-3 px-6 rounded-lg">
-//                     {subcategory}
-//                 </button>
-//             ))}
-//         </div>
-//     );
-// };
-
-// export default Topbar;

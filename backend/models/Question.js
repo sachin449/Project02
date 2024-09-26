@@ -1,90 +1,67 @@
-// Path: backend/models/Question.js
 
 const mongoose = require('mongoose');
 
-// Schema for dynamic fields in a question
+
 const FieldSchema = new mongoose.Schema({
-    label: { // Label for the input field (e.g., Name, Age)
+    label: { 
         type: String,
         required: true,
     },
-    type: { // The type of input field (string, dropdown, number, etc.)
+    type: { 
         type: String,
         enum: ['string', 'number', 'dropdown', 'calendar', 'file'],
         required: true,
     },
-    options: { // For dropdown options (e.g., Yes/No, Yes/No/NA, numbers, etc.)
-        type: [String],
+    options: { 
+        type: [String], 
         required: function() { return this.type === 'dropdown'; }
     },
-    placeholder: { // Placeholder for the input field (optional)
+    placeholder: { 
         type: String,
         default: ''
     },
-    required: { // Whether the field is required or not
+    required: {
         type: Boolean,
         default: false
     },
-    min: { // Minimum value (for number input)
-        type: Number,
+    min: { 
+        type: Number, 
         required: function() { return this.type === 'number'; }
     },
-    max: { // Maximum value (for number input)
-        type: Number,
+    max: {
+        type: Number, 
         required: function() { return this.type === 'number'; }
     },
-    fieldCreatedAt: { // Timestamp when the field was created
+    fieldCreatedAt: {
         type: Date,
         default: Date.now,
     },
-    fieldUpdatedAt: { // Timestamp when the field was last updated
+    fieldUpdatedAt: { 
         type: Date,
         default: Date.now,
     }
 }, { _id: false });
 
-// Main Question Schema
+
 const QuestionSchema = new mongoose.Schema({
-    questionText: { // The main text for the question
+    questionText: { 
         type: String,
         required: true,
     },
-    category: { // The category the question belongs to
+    category: { 
         type: String,
         required: true,
     },
-    subCategory: { // The subcategory the question belongs to
+    subCategory: {
         type: String,
         required: true,
     },
-    questionFields: { // An array of fields for this question (dynamic fields)
-        type: [FieldSchema], // Each question can have multiple input fields
+    questionFields: {
+        type: [FieldSchema], 
         required: true,
     }
 }, { 
-    timestamps: true // Automatically adds createdAt and updatedAt fields
+    timestamps: true 
 });
 
 module.exports = mongoose.model('Question', QuestionSchema);
-
-
-// // Path: backend/models/Question.js
-
-// const mongoose = require('mongoose');
-
-// const QuestionSchema = new mongoose.Schema({
-//     questionText: {
-//         type: String,
-//         required: true,
-//     },
-//     category:{
-//         type: String,
-//         required: true,
-//     },
-//     subCategory:{
-//         type: String,
-//         required: true,
-//     }
-// });
-
-// module.exports = mongoose.model('Question', QuestionSchema);

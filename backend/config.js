@@ -1,13 +1,9 @@
-// Path: backend/config.js
-
 module.exports = {
-    fileUploadPath: './uploads', // Local path for storing uploaded files
-    maxFileSize: 5 * 1024 * 1024, // 5 MB file size limit
-    allowedFileTypes: [
-        'image/jpeg',
-        'image/png',
-        'application/pdf',
-        'text/plain',          // For .txt files
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // For .docx files
-    ]
+    apiBaseUrl: 'http://localhost:5000/api',
+    uploadDir: 'uploads/', 
+    fileLimits: {
+        maxFileSize: 5 * 1024 * 1024 
+    },
+    allowedFileTypes: /jpeg|jpg|png|pdf|docx/, 
+    requestTimeout: 10000 
 };

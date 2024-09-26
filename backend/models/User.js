@@ -1,16 +1,27 @@
-// Path: backend/models/User.js
-
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        required: true
     },
     email: {
         type: String,
         required: true,
-        unique: true, // Ensure unique email addresses
+        unique: true 
+    },
+    password: {
+        type: String,
+        required: true  
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],  
+        default: 'user'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 

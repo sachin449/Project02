@@ -1,19 +1,34 @@
-// Path: client/src/components/Sidebar.jsx
 import React from 'react';
+import { FaLeaf, FaChartLine, FaIndustry, FaUsers, FaShieldAlt } from 'react-icons/fa';
 
-const Sidebar = ({ subcategories, onSubcategoryClick }) => {
+const Sidebar = ({ subcategories, onSubcategoryClick, selectedSubcategory }) => {
+    const subcategoryIcons = {
+        'Human Resources': <FaUsers />,
+        Environment: <FaLeaf />,
+        'Community Relations': <FaChartLine />,
+        'Health and Safety': <FaShieldAlt />,
+        'Energy Efficiency': <FaIndustry />
+    };
+
     return (
-        <div className="w-64 fixed left-0 top-16 h-full bg-gray-100 p-4 shadow-md">
-            <h2 className="text-4xl font-bold mb-10">Subcategories</h2>
+        <div className="w-64 left-0 top-8 h-full bg-gradient-to-b from-white rounded-lg to-gray-50 p-4 shadow-lg mt-1 relative">
+            
+            
             {subcategories.length > 0 ? (
-                <ul className="space-y-8">
+                <ul className="space-y-4 ">
                     {subcategories.map((subcategory, index) => (
-                        <li key={index}>
-                            <button 
-                                className="w-full bg-blue-500 text-white text-lg font-semibold py-5 px-4 rounded-xl"
-                                onClick={() => onSubcategoryClick(subcategory)} // Call this function on click
+                        <li key={index} className="relative">
+                            
+                            <button
+                                className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition duration-200 ease-in-out shadow-sm
+                                ${selectedSubcategory === subcategory ? 'bg-blue-100 text-[#01B0F1] shadow-lg' : 'bg-white text-[#01B0F1] hover:bg-blue-100 hover:text-blue-800'}
+                                hover:shadow-lg transform hover:scale-105`}
+                                onClick={() => onSubcategoryClick(subcategory)}
                             >
-                                {subcategory}
+                                <span className="text-lg p-1 bg-blue-100 rounded-full">
+                                    {subcategoryIcons[subcategory] || <FaIndustry />}
+                                </span>
+                                <span className="font-semibold text-sm">{subcategory}</span>
                             </button>
                         </li>
                     ))}
@@ -26,27 +41,3 @@ const Sidebar = ({ subcategories, onSubcategoryClick }) => {
 };
 
 export default Sidebar;
-
-
-// Path: client/src/components/SubcategoryMenu.jsx
-// import React from 'react';
-
-// const Leftbar = ({ subcategories }) => {
-//     const filteredSubcategories = subcategories.filter(subcategory => subcategory);
-
-//     return (
-//         <div className="w-64 fixed left-0 top-0 h-full bg-gray-100 p-4 shadow-md">
-//             <h2 className="text-4xl font-bold ml-14 mt-10 mb-20">Menu</h2>
-//             <ul className="space-y-8">
-//                 {filteredSubcategories.map((subcategory, index) => (
-//                     <li key={index}>
-//                         <button className="w-full bg-blue-500 text-white text-lg font-semibold py-5 px-4 rounded-xl">
-//                             {subcategory}
-//                         </button>
-//                     </li>
-//                 ))}
-//             </ul>
-//         </div>
-//     );
-// };
-// export default Leftbar;
